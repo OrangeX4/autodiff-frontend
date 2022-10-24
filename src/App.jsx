@@ -168,8 +168,8 @@ function App() {
         setSelectedValue(event.target.value);
     };
 
-    const controlProps = (item, uncheckedColor, checkedColor) => ({
-        checked: selectedValue === item,
+    const controlProps = (val, item, uncheckedColor, checkedColor) => ({
+        checked: val,
         onChange: handleChange,
         value: item,
         name: 'color-radio-button-demo',
@@ -198,9 +198,9 @@ function App() {
                             File1 / File2
                         </Typography>
                         <div>
-                            <Radio {...controlProps('green', green[800], green[600])} />
-                            <Radio {...controlProps('yellow', yellow[900], yellow[800])} />
-                            <Radio {...controlProps('red', red[800], red[600])} />
+                            <Radio {...controlProps(selectedValue === 'green', 'green', green[800], green[600])} />
+                            <Radio {...controlProps(selectedValue === 'yellow', 'yellow', yellow[900], yellow[800])} />
+                            <Radio {...controlProps(selectedValue === 'red', 'red', red[800], red[600])} />
                         </div>
                     </Toolbar>
                 </AppBar>
@@ -252,6 +252,7 @@ function App() {
                                         <DifferenceIcon />
                                     </ListItemIcon>
                                     <ListItemText primary="File1 / File2" />
+                                    <Radio {...controlProps(true, 'yellow', yellow[900], yellow[800])} />
                                 </ListItemButton>
                             </List>
                         </Collapse>
