@@ -28,6 +28,10 @@ import Divider from '@mui/material/Divider';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ListItem, Skeleton } from '@mui/material';
 
+import './App.css'
+
+const Prism = require('prismjs');
+
 
 const drawerWidth = 300;
 
@@ -77,34 +81,78 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const mdTheme = createTheme();
 
-const highlightSyntax = (str) => (
-    <pre
-        style={{ display: 'inline' }}
-        dangerouslySetInnerHTML={{
-            // __html: Prism.highlight(str, Prism.languages.javascript),
-            __html: str,
-        }}
-    />
-);
+const highlightSyntax = (str) => {
+    if (!str) return;
+    const html = Prism.highlight(str, Prism.languages.clike, "clike");
+    return <pre><code className="language-cpp" dangerouslySetInnerHTML={{
+        __html: html,
+        // __html: str,
+    }}
+    /></pre>
+};
 
 const oldCode = `
-const a = 10
-const b = 10
-const c = () => console.log('foo')
+#include <stdio.h>
+#include <stdlib.h>
 
-if(a > 10) {
-  console.log('bar')
+int* twoSum(int* nums, int size, int target, int* returnSize) {
+    int* returnValues = (int*)malloc(2 * sizeof(int));
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = i + 1; j < size; ++j) {
+            if (nums[i] + nums[j] == target) {
+                returnValues[0] = i;
+                returnValues[1] = j;
+                *returnSize = 2;
+                return returnValues;
+            }
+        }
+    }
+
+    return 0;
 }
 
-console.log('done')
+int main() {
+    int nums[] = { 2, 7, 11, 15 };
+    int returnSize;
+    int* result = twoSum(nums, 4, 18, &returnSize);
+    printf("%d %d", result[0], result[1]);
+    
+    getchar();
+    getchar();
+    return 0;
+}
 `;
 
 const newCode = `
-const a = 10
-const boo = 10
+#include <stdlib.h>
+#include <stdio.h>
 
-if(a === 10) {
-  console.log('bar')
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    int* returnValues = (int*)malloc(2 * sizeof(int));
+
+    for (int i = 0; i < numsSize; ++i) {
+        for (int j = i + 1; j < numsSize; ++j) {
+            if (nums[i] + nums[j] == target) {
+                returnValues[1] = j;
+                returnValues[0] = i;
+                *returnSize = 2;
+                return returnValues;
+            }
+        }
+    }
+
+    return 0;
+}
+
+int main() {
+    int returnSize;
+    int nums[] = { 2, 7, 11, 15 };
+    int* result = twoSum(nums, 4, 18, &returnSize);
+    printf("%d %d", result[0], result[1]);
+    
+    getchar();
+    return 0;
 }
 `;
 
@@ -245,6 +293,7 @@ function App() {
                     <ReactDiffViewer
                         oldValue={oldCode}
                         newValue={newCode}
+                        showDiffOnly={false}
                         compareMethod={DiffMethod.WORDS}
                         renderContent={highlightSyntax}
                         splitView={true}
