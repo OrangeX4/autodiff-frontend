@@ -8,6 +8,8 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <App />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
   </React.StrictMode>
 );
 

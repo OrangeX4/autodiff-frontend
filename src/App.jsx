@@ -20,12 +20,11 @@ import FileIcon from '@mui/icons-material/DescriptionOutlined';
 import DifferenceIcon from '@mui/icons-material/DifferenceOutlined';
 import ChangeIcon from '@mui/icons-material/VisibilityOutlined';
 import PlayIcon from '@mui/icons-material/PlayArrowOutlined';
-// import ReplayIcon from '@mui/icons-material/ReplayOutlined';
 import ReplayIcon from '@mui/icons-material/PlayDisabledOutlined';
+import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import Container from '@mui/material/Container';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ListItem, Skeleton } from '@mui/material';
 
@@ -78,7 +77,38 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const mdTheme = createTheme();
 
-function DashboardContent() {
+const highlightSyntax = (str) => (
+    <pre
+        style={{ display: 'inline' }}
+        dangerouslySetInnerHTML={{
+            // __html: Prism.highlight(str, Prism.languages.javascript),
+            __html: str,
+        }}
+    />
+);
+
+const oldCode = `
+const a = 10
+const b = 10
+const c = () => console.log('foo')
+
+if(a > 10) {
+  console.log('bar')
+}
+
+console.log('done')
+`;
+
+const newCode = `
+const a = 10
+const boo = 10
+
+if(a === 10) {
+  console.log('bar')
+}
+`;
+
+function App() {
     const [open, setOpen] = useState(true);
     const toggleOpen = () => {
         setOpen(!open);
@@ -177,7 +207,7 @@ function DashboardContent() {
                                 </ListItemButton>
                             </List>
                         </Collapse>
-                        
+
                         <ListItemButton onClick={toggleOpen}>
                             <ListItemIcon>
                                 <FolderIcon />
@@ -202,25 +232,27 @@ function DashboardContent() {
                 <Box
                     component="main"
                     sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
+                        // backgroundColor: (theme) =>
+                        //     theme.palette.mode === 'light'
+                        //         ? theme.palette.grey[100]
+                        //         : theme.palette.grey[900],
                         flexGrow: 1,
                         height: '100vh',
                         overflow: 'auto',
                     }}
                 >
-                    <Toolbar />
-                    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-
-                    </Container>
+                    <Toolbar sx={{ marginBottom: 1 }} />
+                    <ReactDiffViewer
+                        oldValue={oldCode}
+                        newValue={newCode}
+                        compareMethod={DiffMethod.WORDS}
+                        renderContent={highlightSyntax}
+                        splitView={true}
+                    />
                 </Box>
             </Box>
         </ThemeProvider>
     );
 }
 
-export default function Dashboard() {
-    return <DashboardContent />;
-}
+export default App;
