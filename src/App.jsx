@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import { green, yellow, red } from '@mui/material/colors';
+import { green, blue, yellow, red } from '@mui/material/colors';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -21,12 +21,13 @@ import DifferenceIcon from '@mui/icons-material/DifferenceOutlined';
 import ChangeIcon from '@mui/icons-material/VisibilityOutlined';
 import PlayIcon from '@mui/icons-material/PlayArrowOutlined';
 import ReplayIcon from '@mui/icons-material/PlayDisabledOutlined';
-import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
+import SummarizeIcon from '@mui/icons-material/SummarizeOutlined';
 
+import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MenuIcon from '@mui/icons-material/Menu';
-import { ListItem, Skeleton } from '@mui/material';
+import { IconButton, ListItem, Skeleton } from '@mui/material';
 
 import './App.css'
 
@@ -72,7 +73,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
                 }),
                 width: theme.spacing(7),
                 [theme.breakpoints.up('sm')]: {
-                    width: theme.spacing(9),
+                    width: theme.spacing(0),
                 },
             }),
         },
@@ -157,6 +158,11 @@ int main() {
 `;
 
 function App() {
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const toggleDrawer = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
     const [open, setOpen] = useState(true);
     const toggleOpen = () => {
         setOpen(!open);
@@ -186,8 +192,24 @@ function App() {
         <ThemeProvider theme={mdTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <AppBar position="fixed" open={true} color='inherit'>
-                    <Toolbar>
+                <AppBar position="absolute" open={sidebarOpen} color='inherit'>
+                    <Toolbar
+                        sx={{
+                            pr: '24px', // keep right padding when drawer closed
+                        }}
+                    >
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={toggleDrawer}
+                            sx={{
+                                marginRight: '12px',
+                                ...(sidebarOpen && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
                         <Typography
                             component="h1"
                             variant="h6"
@@ -199,23 +221,28 @@ function App() {
                         </Typography>
                         <div>
                             <Radio {...controlProps(selectedValue === 'green', 'green', green[800], green[600])} />
+                            <Radio {...controlProps(selectedValue === 'blue', 'blue', blue[800], blue[600])} />
                             <Radio {...controlProps(selectedValue === 'yellow', 'yellow', yellow[900], yellow[800])} />
                             <Radio {...controlProps(selectedValue === 'red', 'red', red[800], red[600])} />
                         </div>
                     </Toolbar>
                 </AppBar>
-                <Drawer variant="permanent" open={true}>
+                <Drawer variant="permanent" open={sidebarOpen}>
                     <Toolbar
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'space-between',
                             px: [2],
                         }}
                     >
-                        <MenuIcon style={{ marginRight: 30 }} />
+                        <SummarizeIcon />
                         <Typography variant="h6" noWrap>
                             目录
                         </Typography>
+                        <IconButton onClick={toggleDrawer}>
+                            <MenuIcon />
+                        </IconButton>
                     </Toolbar>
                     <Divider />
                     <List component="nav">
@@ -223,7 +250,7 @@ function App() {
                             <ListItemIcon>
                                 <FolderIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Diff" />
+                            <ListItemText primary="Loading" />
                             <ReplayIcon onClick={(e) => e.stopPropagation()} />
                             <ChangeIcon onClick={(e) => e.stopPropagation()} />
                             {open ? <ExpandLess /> : <ExpandMore />}
@@ -254,6 +281,13 @@ function App() {
                                     <ListItemText primary="File1 / File2" />
                                     <Radio {...controlProps(true, 'yellow', yellow[900], yellow[800])} />
                                 </ListItemButton>
+                                <ListItemButton sx={{ pl: 6 }}>
+                                    <ListItemIcon>
+                                        <DifferenceIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="File1 / File4" />
+                                    <Radio {...controlProps(true, 'red', red[800], red[600])} />
+                                </ListItemButton>
                             </List>
                         </Collapse>
 
@@ -268,13 +302,60 @@ function App() {
                         </ListItemButton>
                         <Collapse in={open} timeout="auto" unmountOnExit>
                             <List component="div" disablePadding>
-                                <ListItemButton sx={{ pl: 6 }}>
+                                <ListItemButton onClick={toggleOpen} sx={{ pl: 3 }}>
                                     <ListItemIcon>
                                         <FileIcon />
                                     </ListItemIcon>
                                     <ListItemText primary="File1" />
+                                    {open ? <ExpandLess /> : <ExpandMore />}
                                 </ListItemButton>
                             </List>
+                            <Collapse in={open} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    <ListItemButton sx={{ pl: 6 }}>
+                                        <ListItemIcon>
+                                            <DifferenceIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="File1 / File3" />
+                                        <Radio {...controlProps(true, 'green', green[800], green[600])} />
+                                    </ListItemButton>
+                                    <ListItemButton sx={{ pl: 6 }}>
+                                        <ListItemIcon>
+                                            <DifferenceIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="File1 / File4" />
+                                        <Radio {...controlProps(true, 'blue', blue[800], blue[600])} />
+                                    </ListItemButton>
+                                </List>
+                            </Collapse>
+
+                            <List component="div" disablePadding>
+                                <ListItemButton onClick={toggleOpen} sx={{ pl: 3 }}>
+                                    <ListItemIcon>
+                                        <FileIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="File2" />
+                                    {open ? <ExpandLess /> : <ExpandMore />}
+                                </ListItemButton>
+                            </List>
+                            <Collapse in={open} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    <ListItemButton sx={{ pl: 6 }}>
+                                        <ListItemIcon>
+                                            <DifferenceIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="File2 / File3" />
+                                        <Radio {...controlProps(true, 'green', green[800], green[600])} />
+                                    </ListItemButton>
+                                    <ListItemButton sx={{ pl: 6 }}>
+                                        <ListItemIcon>
+                                            <DifferenceIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="File2 / File4" />
+                                        <Radio {...controlProps(true, 'blue', blue[800], blue[600])} />
+                                    </ListItemButton>
+                                </List>
+                            </Collapse>
                         </Collapse>
                     </List>
                 </Drawer>
