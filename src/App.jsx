@@ -96,6 +96,19 @@ const highlightSyntax = (str) => {
 };
 
 
+function getColor(auto, manual) {
+    if (manual === "equiv") {
+        return "green";
+    } else if (auto === "unequiv" || manual === "unequiv") {
+        return "red";
+    } else if (auto === "equiv") {
+        return "blue";
+    } else {
+        return "yellow";
+    }
+}
+
+
 function App() {
     // clusters
     const [clusters, setClusters] = useState({
@@ -799,19 +812,48 @@ function App() {
         return "";
     }
 
+    // get color from file1 and file2
+    function getColorFromFiles(cluster_name, file1, file2) {
+        if (cluster_name === '' || file1 === '' || file2 === '') {
+            return 'red';
+        }
+        return getColor(clusters[cluster_name].data.diff[file1][file2].auto,
+            clusters[cluster_name].data.diff[file1][file2].manual);
+    }
+
+    // render Radio
+    function renderRadio(color) {
+        switch (color) {
+            case "green":
+                return <Radio {...controlProps(true, 'green', green[800], green[600])} />;
+            case "blue":
+                return <Radio {...controlProps(true, 'blue', blue[800], blue[600])} />;
+            case "yellow":
+                return <Radio {...controlProps(true, 'yellow', yellow[900], yellow[800])} />;
+            case "red":
+                return <Radio {...controlProps(true, 'red', red[800], red[600])} />;
+            default:
+                return <Radio {...controlProps(true, 'red', red[800], red[600])} />;
+        }
+    }
+
     // render files or diff
     function renderFiles(cluster_name) {
         if (clusters[cluster_name].list) {
             return (
                 <List component="div" disablePadding>
                     {
-                        clusters[cluster_name].data.diff_list.map((diff) => (
-                            <ListItemButton sx={{ pl: 6 }}>
+                        clusters[cluster_name].data.diff_list.filter((diff) => {
+                            const color = getColor(diff.auto, diff.manual);
+                            return !clusters[cluster_name].filter || color === 'blue' || color === 'yellow';
+                        }).map((diff) => (
+                            <ListItemButton onClick={() => openDiff(cluster_name, diff.file1, diff.file2)}
+                                sx={{ pl: 6 }} key={diff.file1 + " / " + diff.file2}>
                                 <ListItemIcon>
                                     <DifferenceIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={diff.file1 + " / " + diff.file2} />
-                                <Radio {...controlProps(true, 'yellow', yellow[900], yellow[800])} />
+                                {renderRadio(getColor(diff.auto, diff.manual))}
                             </ListItemButton>
                         ))
                     }
@@ -821,9 +863,9 @@ function App() {
             return (
                 <>{
                     Object.keys(clusters[cluster_name].data.files).map((file) => (
-                        <>
+                        <div key={file}>
                             <List component="div" disablePadding>
-                                <ListItemButton onClick={toggleOpen} sx={{ pl: 3 }}>
+                                <ListItemButton onClick={() => toggleOpenFile(cluster_name, file)} sx={{ pl: 3 }}>
                                     <ListItemIcon>
                                         <FileIcon />
                                     </ListItemIcon>
@@ -834,19 +876,23 @@ function App() {
                             <Collapse in={clusters[cluster_name].open.files[file]} timeout="auto" unmountOnExit>
                                 <List component="div" disablePadding>
                                     {
-                                        Object.keys(clusters[cluster_name].data.diff[file]).map((file2) => (
-                                            <ListItemButton sx={{ pl: 6 }}>
+                                        Object.keys(clusters[cluster_name].data.diff[file]).filter((file2) => {
+                                            const color = getColorFromFiles(cluster_name, file, file2);
+                                            return !clusters[cluster_name].filter || color === 'blue' || color === 'yellow';
+                                        }).map((file2) => (
+                                            <ListItemButton onClick={() => openDiff(cluster_name, file, file2)}
+                                                sx={{ pl: 6 }} key={file + " / " + file2}>
                                                 <ListItemIcon>
                                                     <DifferenceIcon />
                                                 </ListItemIcon>
                                                 <ListItemText primary={file + " / " + file2} />
-                                                <Radio {...controlProps(true, 'green', green[800], green[600])} />
+                                                {renderRadio(getColorFromFiles(cluster_name, file, file2))}
                                             </ListItemButton>
                                         ))
                                     }
                                 </List>
                             </Collapse>
-                        </>
+                        </div>
                     ))
                 }</>
             )
@@ -854,20 +900,36 @@ function App() {
     }
 
     // cluster_name, file1, file2
-    const [clusterName, setClusterName] = useState("4A");
-    const [file1, setFile1] = useState("117364748.cpp");
-    const [file2, setFile2] = useState("134841308.cpp");
+    const [clusterName, setClusterName] = useState("");
+    const [file1, setFile1] = useState("");
+    const [file2, setFile2] = useState("");
+
+    function openDiff(cluster_name, file1, file2) {
+        setClusterName(cluster_name);
+        setFile1(file1);
+        setFile2(file2);
+    }
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const toggleDrawer = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    function toggleOpen(cluster_name) {
+    function toggleOpenCluster(cluster_name) {
         if (clusters[cluster_name].open.cluster) {
             clusters[cluster_name].open.cluster = false;
         } else {
             clusters[cluster_name].open.cluster = true;
+        }
+        // update clusters
+        setClusters({ ...clusters });
+    };
+
+    function toggleOpenFile(cluster_name, file) {
+        if (clusters[cluster_name].open.files[file]) {
+            clusters[cluster_name].open.files[file] = false;
+        } else {
+            clusters[cluster_name].open.files[file] = true;
         }
         // update clusters
         setClusters({ ...clusters });
@@ -891,17 +953,16 @@ function App() {
         }
         // update clusters
         setClusters({ ...clusters });
-    }
+    };
 
-    const [selectedValue, setSelectedValue] = useState('yellow');
 
-    const handleChange = (event) => {
-        setSelectedValue(event.target.value);
+    const handleChangeRadio = (event) => {
+        // setSelectedValue(event.target.value);
     };
 
     const controlProps = (val, item, uncheckedColor, checkedColor) => ({
         checked: val,
-        onChange: handleChange,
+        onChange: handleChangeRadio,
         value: item,
         name: 'color-radio-button-demo',
         inputProps: { 'aria-label': item },
@@ -945,10 +1006,10 @@ function App() {
                             {file1} / {file2}
                         </Typography>
                         <div>
-                            <Radio {...controlProps(selectedValue === 'green', 'green', green[800], green[600])} />
-                            <Radio {...controlProps(selectedValue === 'blue', 'blue', blue[800], blue[600])} />
-                            <Radio {...controlProps(selectedValue === 'yellow', 'yellow', yellow[900], yellow[800])} />
-                            <Radio {...controlProps(selectedValue === 'red', 'red', red[800], red[600])} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'green', 'green', green[800], green[600])} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'blue', 'blue', blue[800], blue[600])} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'yellow', 'yellow', yellow[900], yellow[800])} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'red', 'red', red[800], red[600])} />
                         </div>
                     </Toolbar>
                 </AppBar>
@@ -973,8 +1034,8 @@ function App() {
                     <List component="nav">
                         {
                             Object.keys(clusters).map((cluster_name) => (
-                                <>
-                                    <ListItemButton onClick={() => toggleOpen(cluster_name)}>
+                                <div key={cluster_name}>
+                                    <ListItemButton onClick={() => toggleOpenCluster(cluster_name)}>
                                         <ListItemIcon>
                                             <FolderIcon />
                                         </ListItemIcon>
@@ -1021,7 +1082,7 @@ function App() {
                                             )
                                         }
                                     </Collapse>
-                                </>
+                                </div>
                             ))
                         }
                     </List>
