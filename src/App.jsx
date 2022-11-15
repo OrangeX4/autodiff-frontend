@@ -18,9 +18,12 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import FolderIcon from '@mui/icons-material/FolderOutlined';
 import FileIcon from '@mui/icons-material/DescriptionOutlined';
 import DifferenceIcon from '@mui/icons-material/DifferenceOutlined';
-import ChangeIcon from '@mui/icons-material/VisibilityOutlined';
 import PlayIcon from '@mui/icons-material/PlayArrowOutlined';
 import ReplayIcon from '@mui/icons-material/PlayDisabledOutlined';
+import FilterIcon from '@mui/icons-material/FilterListOutlined';
+import FilterOffIcon from '@mui/icons-material/FilterListOffOutlined';
+import ReorderIcon from '@mui/icons-material/ReorderOutlined';
+import SegmentIcon from '@mui/icons-material/SegmentOutlined';
 import SummarizeIcon from '@mui/icons-material/SummarizeOutlined';
 
 import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
@@ -29,12 +32,12 @@ import Divider from '@mui/material/Divider';
 import MenuIcon from '@mui/icons-material/Menu';
 import { IconButton, ListItem, Skeleton } from '@mui/material';
 
-import './App.css'
+import './App.css';
 
 const Prism = require('prismjs');
 
 
-const drawerWidth = 300;
+const drawerWidth = 400;
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
@@ -92,81 +95,803 @@ const highlightSyntax = (str) => {
     /></pre>
 };
 
-const oldCode = `
-#include <stdio.h>
-#include <stdlib.h>
-
-int* twoSum(int* nums, int size, int target, int* returnSize) {
-    int* returnValues = (int*)malloc(2 * sizeof(int));
-
-    for (int i = 0; i < size; ++i) {
-        for (int j = i + 1; j < size; ++j) {
-            if (nums[i] + nums[j] == target) {
-                returnValues[0] = i;
-                returnValues[1] = j;
-                *returnSize = 2;
-                return returnValues;
-            }
-        }
-    }
-
-    return 0;
-}
-
-int main() {
-    int nums[] = { 2, 7, 11, 15 };
-    int returnSize;
-    int* result = twoSum(nums, 4, 18, &returnSize);
-    printf("%d %d", result[0], result[1]);
-    
-    getchar();
-    getchar();
-    return 0;
-}
-`;
-
-const newCode = `
-#include <stdlib.h>
-#include <stdio.h>
-
-int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
-    int* returnValues = (int*)malloc(2 * sizeof(int));
-
-    for (int i = 0; i < numsSize; ++i) {
-        for (int j = i + 1; j < numsSize; ++j) {
-            if (nums[i] + nums[j] == target) {
-                returnValues[1] = j;
-                returnValues[0] = i;
-                *returnSize = 2;
-                return returnValues;
-            }
-        }
-    }
-
-    return 0;
-}
-
-int main() {
-    int returnSize;
-    int nums[] = { 2, 7, 11, 15 };
-    int* result = twoSum(nums, 4, 18, &returnSize);
-    printf("%d %d", result[0], result[1]);
-    
-    getchar();
-    return 0;
-}
-`;
 
 function App() {
+    // clusters
+    const [clusters, setClusters] = useState({
+        "4A": {
+            "open": {
+                "cluster": false,
+                "files": {
+                    "101036360.cpp": true,
+                    "117364748.cpp": true,
+                    "127473352.cpp": false,
+                    "134841308.cpp": false,
+                    "173077807.cpp": false,
+                    "48762087.cpp": false,
+                    "84822638.cpp": false,
+                    "84822639.cpp": false
+                }
+            },
+            "running": false,
+            "list": false,
+            "filter": false,
+            "data": {
+                "cluster_name": "4A",
+                "config": {
+                    "random_seed": 0,
+                    "random_test_times": 10
+                },
+                "custom_input": [],
+                "diff": {
+                    "101036360.cpp": {
+                        "117364748.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "127473352.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "134841308.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "173077807.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "48762087.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822638.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822639.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        }
+                    },
+                    "117364748.cpp": {
+                        "101036360.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "127473352.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "134841308.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "173077807.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "48762087.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822638.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822639.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        }
+                    },
+                    "127473352.cpp": {
+                        "101036360.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "117364748.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "134841308.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        },
+                        "173077807.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "48762087.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822638.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822639.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        }
+                    },
+                    "134841308.cpp": {
+                        "101036360.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "117364748.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "127473352.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        },
+                        "173077807.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "48762087.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822638.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822639.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        }
+                    },
+                    "173077807.cpp": {
+                        "101036360.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "117364748.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "127473352.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "134841308.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "48762087.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822638.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        },
+                        "84822639.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        }
+                    },
+                    "48762087.cpp": {
+                        "101036360.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "117364748.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "127473352.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "134841308.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "173077807.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822638.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822639.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        }
+                    },
+                    "84822638.cpp": {
+                        "101036360.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "117364748.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "127473352.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "134841308.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "173077807.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        },
+                        "48762087.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822639.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        }
+                    },
+                    "84822639.cpp": {
+                        "101036360.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "117364748.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "127473352.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "134841308.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "173077807.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        },
+                        "48762087.cpp": {
+                            "auto": "unequiv",
+                            "logic": "unequiv",
+                            "manual": "unknown"
+                        },
+                        "84822638.cpp": {
+                            "auto": "equiv",
+                            "logic": "unknown",
+                            "manual": "unknown"
+                        }
+                    }
+                },
+                "diff_list": [
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "101036360.cpp",
+                        "file2": "117364748.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "101036360.cpp",
+                        "file2": "127473352.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "101036360.cpp",
+                        "file2": "134841308.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "101036360.cpp",
+                        "file2": "173077807.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "101036360.cpp",
+                        "file2": "48762087.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "101036360.cpp",
+                        "file2": "84822638.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "101036360.cpp",
+                        "file2": "84822639.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "117364748.cpp",
+                        "file2": "127473352.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "117364748.cpp",
+                        "file2": "134841308.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "117364748.cpp",
+                        "file2": "173077807.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "117364748.cpp",
+                        "file2": "48762087.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "117364748.cpp",
+                        "file2": "84822638.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "117364748.cpp",
+                        "file2": "84822639.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "equiv",
+                        "cluster_name": "4A",
+                        "file1": "127473352.cpp",
+                        "file2": "134841308.cpp",
+                        "logic": "unknown",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "127473352.cpp",
+                        "file2": "173077807.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "127473352.cpp",
+                        "file2": "48762087.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "127473352.cpp",
+                        "file2": "84822638.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "127473352.cpp",
+                        "file2": "84822639.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "134841308.cpp",
+                        "file2": "173077807.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "134841308.cpp",
+                        "file2": "48762087.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "134841308.cpp",
+                        "file2": "84822638.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "134841308.cpp",
+                        "file2": "84822639.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "173077807.cpp",
+                        "file2": "48762087.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "equiv",
+                        "cluster_name": "4A",
+                        "file1": "173077807.cpp",
+                        "file2": "84822638.cpp",
+                        "logic": "unknown",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "equiv",
+                        "cluster_name": "4A",
+                        "file1": "173077807.cpp",
+                        "file2": "84822639.cpp",
+                        "logic": "unknown",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "48762087.cpp",
+                        "file2": "84822638.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "unequiv",
+                        "cluster_name": "4A",
+                        "file1": "48762087.cpp",
+                        "file2": "84822639.cpp",
+                        "logic": "unequiv",
+                        "manual": "unknown"
+                    },
+                    {
+                        "auto": "equiv",
+                        "cluster_name": "4A",
+                        "file1": "84822638.cpp",
+                        "file2": "84822639.cpp",
+                        "logic": "unknown",
+                        "manual": "unknown"
+                    }
+                ],
+                "equiv": [],
+                "files": {
+                    "101036360.cpp": {
+                        "content": "#include<iostream>\nusing namespace std;\nint main(){\n\tint n;\n\tcin>>n;\n\tcout<<\"Yes\";\n}\n",
+                        "equiv_class": "101036360.cpp"
+                    },
+                    "117364748.cpp": {
+                        "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n\n    return 0;\n}",
+                        "equiv_class": "117364748.cpp"
+                    },
+                    "127473352.cpp": {
+                        "content": "#include <iostream>\nusing namespace std; \nint main() {\n\tcout<<\"YES\";\n\treturn 0;\n}",
+                        "equiv_class": "127473352.cpp"
+                    },
+                    "134841308.cpp": {
+                        "content": "#include<iostream>\nusing namespace std;\nint main(){\n\tcout<<\"YES\";\n\treturn 0;\n} ",
+                        "equiv_class": "134841308.cpp"
+                    },
+                    "173077807.cpp": {
+                        "content": "#import<iostream>\nmain(int n){std::cin>>n;puts(n<3|n%2?\"NO\":\"YES\");}",
+                        "equiv_class": "173077807.cpp"
+                    },
+                    "48762087.cpp": {
+                        "content": "#include<iostream>\nusing namespace std ;\nint main()\n{\n    cout<<\"HELLO\" ;\n}",
+                        "equiv_class": "48762087.cpp"
+                    },
+                    "84822638.cpp": {
+                        "content": "#import<cstdio>\nmain(int w){scanf(\"%d\",&w);puts(w<3||w%2?\"NO\":\"YES\");}",
+                        "equiv_class": "84822638.cpp"
+                    },
+                    "84822639.cpp": {
+                        "content": "#include<cstdio>\nmain(int w){scanf(\"%d\",&w);puts(w<3||w%2?\"NO\":\"YES\");}",
+                        "equiv_class": "84822639.cpp"
+                    }
+                },
+                "is_loaded": true,
+                "random_input_generator": {
+                    "content": "int(1,100)",
+                    "type": "stdin_format.txt"
+                },
+                "unequiv": [
+                    [
+                        "117364748.cpp",
+                        "134841308.cpp"
+                    ],
+                    [
+                        "117364748.cpp",
+                        "48762087.cpp"
+                    ],
+                    [
+                        "134841308.cpp",
+                        "84822639.cpp"
+                    ],
+                    [
+                        "48762087.cpp",
+                        "84822638.cpp"
+                    ],
+                    [
+                        "117364748.cpp",
+                        "173077807.cpp"
+                    ],
+                    [
+                        "127473352.cpp",
+                        "48762087.cpp"
+                    ],
+                    [
+                        "101036360.cpp",
+                        "134841308.cpp"
+                    ],
+                    [
+                        "101036360.cpp",
+                        "48762087.cpp"
+                    ],
+                    [
+                        "117364748.cpp",
+                        "84822638.cpp"
+                    ],
+                    [
+                        "48762087.cpp",
+                        "84822639.cpp"
+                    ],
+                    [
+                        "127473352.cpp",
+                        "173077807.cpp"
+                    ],
+                    [
+                        "101036360.cpp",
+                        "173077807.cpp"
+                    ],
+                    [
+                        "134841308.cpp",
+                        "48762087.cpp"
+                    ],
+                    [
+                        "127473352.cpp",
+                        "84822638.cpp"
+                    ],
+                    [
+                        "117364748.cpp",
+                        "84822639.cpp"
+                    ],
+                    [
+                        "134841308.cpp",
+                        "173077807.cpp"
+                    ],
+                    [
+                        "101036360.cpp",
+                        "84822638.cpp"
+                    ],
+                    [
+                        "117364748.cpp",
+                        "127473352.cpp"
+                    ],
+                    [
+                        "101036360.cpp",
+                        "117364748.cpp"
+                    ],
+                    [
+                        "127473352.cpp",
+                        "84822639.cpp"
+                    ],
+                    [
+                        "134841308.cpp",
+                        "84822638.cpp"
+                    ],
+                    [
+                        "101036360.cpp",
+                        "84822639.cpp"
+                    ],
+                    [
+                        "101036360.cpp",
+                        "127473352.cpp"
+                    ],
+                    [
+                        "173077807.cpp",
+                        "48762087.cpp"
+                    ]
+                ]
+            }
+        }
+    });
+
+    // get file content from clusters
+    function getFileContent(cluster_name, file) {
+        if (cluster_name in clusters) {
+            if (file in clusters[cluster_name].data.files) {
+                return clusters[cluster_name].data.files[file].content;
+            }
+        }
+        return "";
+    }
+
+    // render files or diff
+    function renderFiles(cluster_name) {
+        if (clusters[cluster_name].list) {
+            return (
+                <List component="div" disablePadding>
+                    {
+                        clusters[cluster_name].data.diff_list.map((diff) => (
+                            <ListItemButton sx={{ pl: 6 }}>
+                                <ListItemIcon>
+                                    <DifferenceIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={diff.file1 + " / " + diff.file2} />
+                                <Radio {...controlProps(true, 'yellow', yellow[900], yellow[800])} />
+                            </ListItemButton>
+                        ))
+                    }
+                </List>
+            )
+        } else {
+            return (
+                <>{
+                    Object.keys(clusters[cluster_name].data.files).map((file) => (
+                        <>
+                            <List component="div" disablePadding>
+                                <ListItemButton onClick={toggleOpen} sx={{ pl: 3 }}>
+                                    <ListItemIcon>
+                                        <FileIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary={file} />
+                                    {clusters[cluster_name].open.files[file] ? <ExpandLess /> : <ExpandMore />}
+                                </ListItemButton>
+                            </List>
+                            <Collapse in={clusters[cluster_name].open.files[file]} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    {
+                                        Object.keys(clusters[cluster_name].data.diff[file]).map((file2) => (
+                                            <ListItemButton sx={{ pl: 6 }}>
+                                                <ListItemIcon>
+                                                    <DifferenceIcon />
+                                                </ListItemIcon>
+                                                <ListItemText primary={file + " / " + file2} />
+                                                <Radio {...controlProps(true, 'green', green[800], green[600])} />
+                                            </ListItemButton>
+                                        ))
+                                    }
+                                </List>
+                            </Collapse>
+                        </>
+                    ))
+                }</>
+            )
+        }
+    }
+
+    // cluster_name, file1, file2
+    const [clusterName, setClusterName] = useState("4A");
+    const [file1, setFile1] = useState("117364748.cpp");
+    const [file2, setFile2] = useState("134841308.cpp");
+
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const toggleDrawer = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    const [open, setOpen] = useState(true);
-    const toggleOpen = () => {
-        setOpen(!open);
+    function toggleOpen(cluster_name) {
+        if (clusters[cluster_name].open.cluster) {
+            clusters[cluster_name].open.cluster = false;
+        } else {
+            clusters[cluster_name].open.cluster = true;
+        }
+        // update clusters
+        setClusters({ ...clusters });
     };
+
+    function toggleList(cluster_name) {
+        if (clusters[cluster_name].list) {
+            clusters[cluster_name].list = false;
+        } else {
+            clusters[cluster_name].list = true;
+        }
+        // update clusters
+        setClusters({ ...clusters });
+    };
+
+    function toggleFilter(cluster_name) {
+        if (clusters[cluster_name].filter) {
+            clusters[cluster_name].filter = false;
+        } else {
+            clusters[cluster_name].filter = true;
+        }
+        // update clusters
+        setClusters({ ...clusters });
+    }
 
     const [selectedValue, setSelectedValue] = useState('yellow');
 
@@ -217,7 +942,7 @@ function App() {
                             noWrap
                             sx={{ flexGrow: 1 }}
                         >
-                            File1 / File2
+                            {file1} / {file2}
                         </Typography>
                         <div>
                             <Radio {...controlProps(selectedValue === 'green', 'green', green[800], green[600])} />
@@ -246,117 +971,59 @@ function App() {
                     </Toolbar>
                     <Divider />
                     <List component="nav">
-                        <ListItemButton onClick={toggleOpen}>
-                            <ListItemIcon>
-                                <FolderIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Loading" />
-                            <ReplayIcon onClick={(e) => e.stopPropagation()} />
-                            <ChangeIcon onClick={(e) => e.stopPropagation()} />
-                            {open ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                        <Collapse in={open} timeout="auto" unmountOnExit>
-                            <List component="div" disablePadding>
-                                <ListItem sx={{ pl: 6 }}>
-                                    <Skeleton variant="text" width={300} height={30} />
-                                </ListItem>
-                            </List>
-                        </Collapse>
-
-                        <ListItemButton onClick={toggleOpen}>
-                            <ListItemIcon>
-                                <FolderIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Diff" />
-                            <PlayIcon onClick={(e) => e.stopPropagation()} />
-                            <ChangeIcon onClick={(e) => e.stopPropagation()} />
-                            {open ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                        <Collapse in={open} timeout="auto" unmountOnExit>
-                            <List component="div" disablePadding>
-                                <ListItemButton sx={{ pl: 6 }}>
-                                    <ListItemIcon>
-                                        <DifferenceIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="File1 / File2" />
-                                    <Radio {...controlProps(true, 'yellow', yellow[900], yellow[800])} />
-                                </ListItemButton>
-                                <ListItemButton sx={{ pl: 6 }}>
-                                    <ListItemIcon>
-                                        <DifferenceIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="File1 / File4" />
-                                    <Radio {...controlProps(true, 'red', red[800], red[600])} />
-                                </ListItemButton>
-                            </List>
-                        </Collapse>
-
-                        <ListItemButton onClick={toggleOpen}>
-                            <ListItemIcon>
-                                <FolderIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Folder" />
-                            <PlayIcon onClick={(e) => e.stopPropagation()} />
-                            <ChangeIcon onClick={(e) => e.stopPropagation()} />
-                            {open ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                        <Collapse in={open} timeout="auto" unmountOnExit>
-                            <List component="div" disablePadding>
-                                <ListItemButton onClick={toggleOpen} sx={{ pl: 3 }}>
-                                    <ListItemIcon>
-                                        <FileIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="File1" />
-                                    {open ? <ExpandLess /> : <ExpandMore />}
-                                </ListItemButton>
-                            </List>
-                            <Collapse in={open} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    <ListItemButton sx={{ pl: 6 }}>
+                        {
+                            Object.keys(clusters).map((cluster_name) => (
+                                <>
+                                    <ListItemButton onClick={() => toggleOpen(cluster_name)}>
                                         <ListItemIcon>
-                                            <DifferenceIcon />
+                                            <FolderIcon />
                                         </ListItemIcon>
-                                        <ListItemText primary="File1 / File3" />
-                                        <Radio {...controlProps(true, 'green', green[800], green[600])} />
+                                        <ListItemText primary={cluster_name} />
+                                        {
+                                            clusters[cluster_name].running ? (
+                                                <ReplayIcon onClick={(e) => { e.stopPropagation(); }} />
+                                            ) : (
+                                                <PlayIcon onClick={(e) => { e.stopPropagation(); }} />
+                                            )
+                                        }
+                                        {
+                                            clusters[cluster_name].list ? (
+                                                <ReorderIcon onClick={(e) => { e.stopPropagation(); toggleList(cluster_name) }} />
+                                            ) : (
+                                                <SegmentIcon onClick={(e) => { e.stopPropagation(); toggleList(cluster_name) }} />
+                                            )
+                                        }
+                                        {
+                                            clusters[cluster_name].filter ? (
+                                                <FilterIcon onClick={(e) => { e.stopPropagation(); toggleFilter(cluster_name) }} />
+                                            ) : (
+                                                <FilterOffIcon onClick={(e) => { e.stopPropagation(); toggleFilter(cluster_name) }} />
+                                            )
+                                        }
+                                        {
+                                            clusters[cluster_name].open.cluster ? (
+                                                <ExpandLess />
+                                            ) : (
+                                                <ExpandMore />
+                                            )
+                                        }
                                     </ListItemButton>
-                                    <ListItemButton sx={{ pl: 6 }}>
-                                        <ListItemIcon>
-                                            <DifferenceIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="File1 / File4" />
-                                        <Radio {...controlProps(true, 'blue', blue[800], blue[600])} />
-                                    </ListItemButton>
-                                </List>
-                            </Collapse>
-
-                            <List component="div" disablePadding>
-                                <ListItemButton onClick={toggleOpen} sx={{ pl: 3 }}>
-                                    <ListItemIcon>
-                                        <FileIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="File2" />
-                                    {open ? <ExpandLess /> : <ExpandMore />}
-                                </ListItemButton>
-                            </List>
-                            <Collapse in={open} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    <ListItemButton sx={{ pl: 6 }}>
-                                        <ListItemIcon>
-                                            <DifferenceIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="File2 / File3" />
-                                        <Radio {...controlProps(true, 'green', green[800], green[600])} />
-                                    </ListItemButton>
-                                    <ListItemButton sx={{ pl: 6 }}>
-                                        <ListItemIcon>
-                                            <DifferenceIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="File2 / File4" />
-                                        <Radio {...controlProps(true, 'blue', blue[800], blue[600])} />
-                                    </ListItemButton>
-                                </List>
-                            </Collapse>
-                        </Collapse>
+                                    <Collapse in={clusters[cluster_name].open.cluster} timeout="auto" unmountOnExit>
+                                        {
+                                            clusters[cluster_name].running ? (
+                                                <List component="div" disablePadding>
+                                                    <ListItem sx={{ pl: 6 }}>
+                                                        <Skeleton variant="text" width={300} height={30} />
+                                                    </ListItem>
+                                                </List>
+                                            ) : (
+                                                renderFiles(cluster_name)
+                                            )
+                                        }
+                                    </Collapse>
+                                </>
+                            ))
+                        }
                     </List>
                 </Drawer>
                 <Box
@@ -373,8 +1040,8 @@ function App() {
                 >
                     <Toolbar sx={{ marginBottom: 1 }} />
                     <ReactDiffViewer
-                        oldValue={oldCode}
-                        newValue={newCode}
+                        oldValue={getFileContent(clusterName, file1)}
+                        newValue={getFileContent(clusterName, file2)}
                         showDiffOnly={false}
                         compareMethod={DiffMethod.WORDS}
                         renderContent={highlightSyntax}
