@@ -108,6 +108,22 @@ function getColor(auto, logic) {
     }
 }
 
+function downloadFile(filename, text) {
+    const elementA = document.createElement('a')
+
+    // 文件的名称为时间戳加文件名后缀
+    elementA.download = filename
+    elementA.style.display = 'none'
+
+    // 生成一个blob二进制数据，内容为文本数据
+    const blob = new Blob([text])
+
+    //生成一个指向blob的URL地址，并赋值给a标签的href属性
+    elementA.href = URL.createObjectURL(blob)
+    document.body.appendChild(elementA)
+    elementA.click()
+    document.body.removeChild(elementA)
+}
 
 // 读取数据
 const url = "http://localhost:7376";
@@ -180,6 +196,18 @@ function handleRun(cluster_name, clusters, setClusters) {
             clusters[cluster_name].data = data;
             clusters = { ...clusters };
             setClusters(clusters);
+        });
+}
+
+
+function handleCsv() {
+    // GET http://localhost:7376/csv
+    fetch(url + "/csv")
+        .then(response => response.json())
+        .then(data => {
+            downloadFile("equal.csv", data.equal_csv_content);
+            downloadFile("unknown.csv", data.unknown_csv_content);
+            downloadFile("inequal.csv", data.inequal_csv_content);
         });
 }
 
@@ -417,7 +445,9 @@ function App() {
                             px: [2],
                         }}
                     >
-                        <SummarizeIcon />
+                        <IconButton onClick={handleCsv} >
+                            <SummarizeIcon />
+                        </IconButton>
                         <Typography variant="h6" noWrap>
                             目录
                         </Typography>
