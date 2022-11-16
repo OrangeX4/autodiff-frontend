@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import { green, blue, yellow, red } from '@mui/material/colors';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -96,10 +96,10 @@ const highlightSyntax = (str) => {
 };
 
 
-function getColor(auto, manual) {
-    if (manual === "equiv") {
+function getColor(auto, logic) {
+    if (logic === "equiv") {
         return "green";
-    } else if (auto === "unequiv" || manual === "unequiv") {
+    } else if (logic === "unequiv") {
         return "red";
     } else if (auto === "equiv") {
         return "blue";
@@ -109,698 +109,89 @@ function getColor(auto, manual) {
 }
 
 
-function App() {
-    // clusters
-    const [clusters, setClusters] = useState({
-        "4A": {
-            "open": {
-                "cluster": false,
-                "files": {
-                    "101036360.cpp": true,
-                    "117364748.cpp": true,
-                    "127473352.cpp": false,
-                    "134841308.cpp": false,
-                    "173077807.cpp": false,
-                    "48762087.cpp": false,
-                    "84822638.cpp": false,
-                    "84822639.cpp": false
+// 读取数据
+const url = "http://localhost:7376";
+
+function initClusters(setClusters) {
+    // GET http://localhost:7376/clusters
+    fetch(url + "/clusters")
+        .then(response => response.json())
+        .then(data => {
+            const result = {};
+            for (const cluster_name in data) {
+                result[cluster_name] = {};
+                result[cluster_name].running = false;
+                result[cluster_name].list = false;
+                result[cluster_name].filter = false;
+                result[cluster_name].open = {
+                    "cluster": false,
+                    "files": {},
+                };
+                for (const file in data[cluster_name].files) {
+                    result[cluster_name].open.files[file] = false;
                 }
-            },
-            "running": false,
-            "list": false,
-            "filter": false,
-            "data": {
-                "cluster_name": "4A",
-                "config": {
-                    "random_seed": 0,
-                    "random_test_times": 10
-                },
-                "custom_input": [],
-                "diff": {
-                    "101036360.cpp": {
-                        "117364748.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "127473352.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "134841308.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "173077807.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "48762087.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822638.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822639.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        }
-                    },
-                    "117364748.cpp": {
-                        "101036360.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "127473352.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "134841308.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "173077807.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "48762087.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822638.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822639.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        }
-                    },
-                    "127473352.cpp": {
-                        "101036360.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "117364748.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "134841308.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        },
-                        "173077807.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "48762087.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822638.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822639.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        }
-                    },
-                    "134841308.cpp": {
-                        "101036360.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "117364748.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "127473352.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        },
-                        "173077807.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "48762087.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822638.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822639.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        }
-                    },
-                    "173077807.cpp": {
-                        "101036360.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "117364748.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "127473352.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "134841308.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "48762087.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822638.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        },
-                        "84822639.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        }
-                    },
-                    "48762087.cpp": {
-                        "101036360.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "117364748.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "127473352.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "134841308.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "173077807.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822638.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822639.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        }
-                    },
-                    "84822638.cpp": {
-                        "101036360.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "117364748.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "127473352.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "134841308.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "173077807.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        },
-                        "48762087.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822639.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        }
-                    },
-                    "84822639.cpp": {
-                        "101036360.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "117364748.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "127473352.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "134841308.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "173077807.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        },
-                        "48762087.cpp": {
-                            "auto": "unequiv",
-                            "logic": "unequiv",
-                            "manual": "unknown"
-                        },
-                        "84822638.cpp": {
-                            "auto": "equiv",
-                            "logic": "unknown",
-                            "manual": "unknown"
-                        }
-                    }
-                },
-                "diff_list": [
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "101036360.cpp",
-                        "file2": "117364748.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "101036360.cpp",
-                        "file2": "127473352.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "101036360.cpp",
-                        "file2": "134841308.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "101036360.cpp",
-                        "file2": "173077807.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "101036360.cpp",
-                        "file2": "48762087.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "101036360.cpp",
-                        "file2": "84822638.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "101036360.cpp",
-                        "file2": "84822639.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "117364748.cpp",
-                        "file2": "127473352.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "117364748.cpp",
-                        "file2": "134841308.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "117364748.cpp",
-                        "file2": "173077807.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "117364748.cpp",
-                        "file2": "48762087.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "117364748.cpp",
-                        "file2": "84822638.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "117364748.cpp",
-                        "file2": "84822639.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "equiv",
-                        "cluster_name": "4A",
-                        "file1": "127473352.cpp",
-                        "file2": "134841308.cpp",
-                        "logic": "unknown",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "127473352.cpp",
-                        "file2": "173077807.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "127473352.cpp",
-                        "file2": "48762087.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "127473352.cpp",
-                        "file2": "84822638.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "127473352.cpp",
-                        "file2": "84822639.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "134841308.cpp",
-                        "file2": "173077807.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "134841308.cpp",
-                        "file2": "48762087.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "134841308.cpp",
-                        "file2": "84822638.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "134841308.cpp",
-                        "file2": "84822639.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "173077807.cpp",
-                        "file2": "48762087.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "equiv",
-                        "cluster_name": "4A",
-                        "file1": "173077807.cpp",
-                        "file2": "84822638.cpp",
-                        "logic": "unknown",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "equiv",
-                        "cluster_name": "4A",
-                        "file1": "173077807.cpp",
-                        "file2": "84822639.cpp",
-                        "logic": "unknown",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "48762087.cpp",
-                        "file2": "84822638.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "unequiv",
-                        "cluster_name": "4A",
-                        "file1": "48762087.cpp",
-                        "file2": "84822639.cpp",
-                        "logic": "unequiv",
-                        "manual": "unknown"
-                    },
-                    {
-                        "auto": "equiv",
-                        "cluster_name": "4A",
-                        "file1": "84822638.cpp",
-                        "file2": "84822639.cpp",
-                        "logic": "unknown",
-                        "manual": "unknown"
-                    }
-                ],
-                "equiv": [],
-                "files": {
-                    "101036360.cpp": {
-                        "content": "#include<iostream>\nusing namespace std;\nint main(){\n\tint n;\n\tcin>>n;\n\tcout<<\"Yes\";\n}\n",
-                        "equiv_class": "101036360.cpp"
-                    },
-                    "117364748.cpp": {
-                        "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n\n    return 0;\n}",
-                        "equiv_class": "117364748.cpp"
-                    },
-                    "127473352.cpp": {
-                        "content": "#include <iostream>\nusing namespace std; \nint main() {\n\tcout<<\"YES\";\n\treturn 0;\n}",
-                        "equiv_class": "127473352.cpp"
-                    },
-                    "134841308.cpp": {
-                        "content": "#include<iostream>\nusing namespace std;\nint main(){\n\tcout<<\"YES\";\n\treturn 0;\n} ",
-                        "equiv_class": "134841308.cpp"
-                    },
-                    "173077807.cpp": {
-                        "content": "#import<iostream>\nmain(int n){std::cin>>n;puts(n<3|n%2?\"NO\":\"YES\");}",
-                        "equiv_class": "173077807.cpp"
-                    },
-                    "48762087.cpp": {
-                        "content": "#include<iostream>\nusing namespace std ;\nint main()\n{\n    cout<<\"HELLO\" ;\n}",
-                        "equiv_class": "48762087.cpp"
-                    },
-                    "84822638.cpp": {
-                        "content": "#import<cstdio>\nmain(int w){scanf(\"%d\",&w);puts(w<3||w%2?\"NO\":\"YES\");}",
-                        "equiv_class": "84822638.cpp"
-                    },
-                    "84822639.cpp": {
-                        "content": "#include<cstdio>\nmain(int w){scanf(\"%d\",&w);puts(w<3||w%2?\"NO\":\"YES\");}",
-                        "equiv_class": "84822639.cpp"
-                    }
-                },
-                "is_loaded": true,
-                "random_input_generator": {
-                    "content": "int(1,100)",
-                    "type": "stdin_format.txt"
-                },
-                "unequiv": [
-                    [
-                        "117364748.cpp",
-                        "134841308.cpp"
-                    ],
-                    [
-                        "117364748.cpp",
-                        "48762087.cpp"
-                    ],
-                    [
-                        "134841308.cpp",
-                        "84822639.cpp"
-                    ],
-                    [
-                        "48762087.cpp",
-                        "84822638.cpp"
-                    ],
-                    [
-                        "117364748.cpp",
-                        "173077807.cpp"
-                    ],
-                    [
-                        "127473352.cpp",
-                        "48762087.cpp"
-                    ],
-                    [
-                        "101036360.cpp",
-                        "134841308.cpp"
-                    ],
-                    [
-                        "101036360.cpp",
-                        "48762087.cpp"
-                    ],
-                    [
-                        "117364748.cpp",
-                        "84822638.cpp"
-                    ],
-                    [
-                        "48762087.cpp",
-                        "84822639.cpp"
-                    ],
-                    [
-                        "127473352.cpp",
-                        "173077807.cpp"
-                    ],
-                    [
-                        "101036360.cpp",
-                        "173077807.cpp"
-                    ],
-                    [
-                        "134841308.cpp",
-                        "48762087.cpp"
-                    ],
-                    [
-                        "127473352.cpp",
-                        "84822638.cpp"
-                    ],
-                    [
-                        "117364748.cpp",
-                        "84822639.cpp"
-                    ],
-                    [
-                        "134841308.cpp",
-                        "173077807.cpp"
-                    ],
-                    [
-                        "101036360.cpp",
-                        "84822638.cpp"
-                    ],
-                    [
-                        "117364748.cpp",
-                        "127473352.cpp"
-                    ],
-                    [
-                        "101036360.cpp",
-                        "117364748.cpp"
-                    ],
-                    [
-                        "127473352.cpp",
-                        "84822639.cpp"
-                    ],
-                    [
-                        "134841308.cpp",
-                        "84822638.cpp"
-                    ],
-                    [
-                        "101036360.cpp",
-                        "84822639.cpp"
-                    ],
-                    [
-                        "101036360.cpp",
-                        "127473352.cpp"
-                    ],
-                    [
-                        "173077807.cpp",
-                        "48762087.cpp"
-                    ]
-                ]
+                result[cluster_name].data = data[cluster_name];
             }
-        }
-    });
+            setClusters(result);
+        });
+}
+
+function updateManual(cluster_name, file1, file2, manual, clusters, setClusters) {
+    // POST http://localhost:7376/update
+    fetch(url + "/update", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            "cluster_name": cluster_name,
+            "file1": file1,
+            "file2": file2,
+            "manual": manual,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            clusters[cluster_name].data = data;
+            clusters = { ...clusters };
+            setClusters(clusters);
+        });
+}
+
+function handleRun(cluster_name, clusters, setClusters) {
+    // POST http://localhost:7376/run
+    // update running
+    clusters[cluster_name].running = true;
+    clusters = { ...clusters };
+    setClusters(clusters);
+    // run
+    fetch(url + "/run", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            "cluster_name": cluster_name,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            clusters[cluster_name].running = false;
+            clusters[cluster_name].data = data;
+            clusters = { ...clusters };
+            setClusters(clusters);
+        });
+}
+
+
+function App() {
+    // init clusters
+    useEffect(() => {
+        initClusters(setClusters);
+    }, []);
+
+    // clusters
+    const [clusters, setClusters] = useState({});
 
     // get file content from clusters
     function getFileContent(cluster_name, file) {
@@ -818,7 +209,7 @@ function App() {
             return 'red';
         }
         return getColor(clusters[cluster_name].data.diff[file1][file2].auto,
-            clusters[cluster_name].data.diff[file1][file2].manual);
+            clusters[cluster_name].data.diff[file1][file2].logic);
     }
 
     // render Radio
@@ -844,7 +235,7 @@ function App() {
                 <List component="div" disablePadding>
                     {
                         clusters[cluster_name].data.diff_list.filter((diff) => {
-                            const color = getColor(diff.auto, diff.manual);
+                            const color = getColor(diff.auto, diff.logic);
                             return !clusters[cluster_name].filter || color === 'blue' || color === 'yellow';
                         }).map((diff) => (
                             <ListItemButton onClick={() => openDiff(cluster_name, diff.file1, diff.file2)}
@@ -853,7 +244,7 @@ function App() {
                                     <DifferenceIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={diff.file1 + " / " + diff.file2} />
-                                {renderRadio(getColor(diff.auto, diff.manual))}
+                                {renderRadio(getColor(diff.auto, diff.logic))}
                             </ListItemButton>
                         ))
                     }
@@ -1006,10 +397,14 @@ function App() {
                             {file1} / {file2}
                         </Typography>
                         <div>
-                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'green', 'green', green[800], green[600])} />
-                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'blue', 'blue', blue[800], blue[600])} />
-                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'yellow', 'yellow', yellow[900], yellow[800])} />
-                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'red', 'red', red[800], red[600])} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'green', 'green', green[800], green[600])}
+                                onClick={() => updateManual(clusterName, file1, file2, "equiv", clusters, setClusters)} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'blue', 'blue', blue[800], blue[600])}
+                                onClick={() => updateManual(clusterName, file1, file2, "unknown", clusters, setClusters)} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'yellow', 'yellow', yellow[900], yellow[800])}
+                                onClick={() => updateManual(clusterName, file1, file2, "unknown", clusters, setClusters)} />
+                            <Radio {...controlProps(getColorFromFiles(clusterName, file1, file2) === 'red', 'red', red[800], red[600])}
+                                onClick={() => updateManual(clusterName, file1, file2, "unequiv", clusters, setClusters)} />
                         </div>
                     </Toolbar>
                 </AppBar>
@@ -1044,7 +439,7 @@ function App() {
                                             clusters[cluster_name].running ? (
                                                 <ReplayIcon onClick={(e) => { e.stopPropagation(); }} />
                                             ) : (
-                                                <PlayIcon onClick={(e) => { e.stopPropagation(); }} />
+                                                <PlayIcon onClick={(e) => { e.stopPropagation(); handleRun(cluster_name, clusters, setClusters) }} />
                                             )
                                         }
                                         {
